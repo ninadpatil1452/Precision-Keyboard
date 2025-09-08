@@ -1,0 +1,38 @@
+\documentclass[12pt, a4paper]{article}
+
+% Fromatting and layout
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{times}
+\usepackage{hyperref}
+
+% Page Margins
+\geometry{
+    a4paper,
+    left=1in,
+    right=1in,
+    top=1in,
+    bottom=1in,
+}
+
+% Title and Author
+\title{\textbf{PrecisionPointer: A Gesture-Activated Interface for Enhanced Mobile Text Selection}}
+\author{Ninad Govind Patil \\
+        Stony Brook University \\
+        \texttt{ninadgovind.patil@stonybrook.edu}}
+\date{}
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\noindent
+Standard text selection on mobile touchscreens, reliant on drag handles, remains a significant source of user frustration. This interaction is often hampered by the "fat finger" problem, where the user's finger occludes the very text they are trying to select, leading to frequent errors, increased cognitive load, and a degraded user experience, especially for tasks requiring character-level precision. This project introduces "PrecisionPointer," a novel interaction paradigm designed to overcome these limitations. The proposed solution is a gesture-activated "precision mode"—triggered by a long-press—which presents an uncluttered interface featuring a large, magnified view of the text caret and discrete on-screen buttons for single-character adjustments. This design decouples the act of selection from the point of contact, allowing for rapid and accurate text highlighting.
+
+To evaluate this concept, a functional prototype will be developed as a native iOS application. A lightweight backend REST API, developed in Go (Golang), will support the study by programmatically capturing performance metrics like task completion time and error rates. A within-subjects study will be conducted where the presentation order of the selection methods is counterbalanced across participants to mitigate learning effects. User satisfaction will be measured quantitatively via the System Usability Scale (SUS) and qualitatively through post-session feedback.
+
+I hypothesize that PrecisionPointer will demonstrate a statistically significant improvement in both speed and accuracy for precision-oriented tasks and will receive higher subjective satisfaction ratings. The findings aim to contribute a validated, alternative text-selection model that could inform the design of future mobile operating systems where precise text manipulation is critical.
+\end{abstract}
+
+\end{document}

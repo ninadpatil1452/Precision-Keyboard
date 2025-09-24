@@ -1,0 +1,8 @@
+//
+//  Debug.xcconfig
+//  Precision Keyboard
+//
+//  Created by Ninad Patil on 24/09/25.
+//
+
+BASE_URL = http://localhost:8080

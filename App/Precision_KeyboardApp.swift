@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct Precision_KeyboardApp: App {
+    @StateObject private var session = StudySessionStore()
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
+              .environmentObject(session)
         }
     }
 }

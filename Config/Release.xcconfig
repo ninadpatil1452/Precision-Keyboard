@@ -1,0 +1,8 @@
+//
+//  Release.xcconfig
+//  Precision Keyboard
+//
+//  Created by Ninad Patil on 24/09/25.
+//
+
+BASE_URL = https://api.yourdomain.com

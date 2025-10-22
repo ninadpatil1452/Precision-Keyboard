@@ -26,6 +26,18 @@ final class EditorViewModel: ObservableObject {
     private var netDeltaChars: Int = 0
     private var lastAnchorIndex: Int = 0
     private var usedPrecisionEver: Bool = false
+    
+    // Enhanced metrics tracking
+    private var precisionModeActivations: Int = 0
+    private var precisionModeStartTime: Date?
+    private var totalPrecisionDuration: TimeInterval = 0
+    private var gestureCount: Int = 0
+    private var longPressCount: Int = 0
+    private var tapCount: Int = 0
+    private var dragCount: Int = 0
+    private var errorCount: Int = 0
+    private var lastSelectionWasCorrect: Bool = false
+    private var completionStatus: CompletionStatus = .completed
 
     // MARK: - Caret/Loupe
     private weak var sourceView: UIView?
@@ -34,9 +46,12 @@ final class EditorViewModel: ObservableObject {
     // MARK: - Callbacks
     var onAdvance: (() -> Void)?
     var onFinish: ((MetricEvent) -> Void)?
+    
+    // MARK: - State Management
+    var hasAdvanced: Bool = false
 
     // MARK: - Task Context
-    let task: StudyTask
+    var task: StudyTask
     let sessionId: String
 
     // MARK: - Init
@@ -47,6 +62,37 @@ final class EditorViewModel: ObservableObject {
         self.startedAt = Date()
         self.lastAnchorIndex = 0
     }
+    
+    // MARK: - Task Management
+    func updateTask(_ newTask: StudyTask) {
+        print("🔄 Updating task from '\(task.title)' to '\(newTask.title)'")
+        self.task = newTask
+        self.text = newTask.initialText
+        self.selected = NSRange(location: 0, length: 0)
+        self.startedAt = Date()
+        self.lastAnchorIndex = 0
+        self.hint = nil
+        
+        // Reset all metrics
+        self.selectionChangeCount = 0
+        self.netDeltaChars = 0
+        self.usedPrecisionEver = false
+        self.precisionModeActivations = 0
+        self.totalPrecisionDuration = 0
+        self.precisionModeStartTime = nil
+        self.gestureCount = 0
+        self.longPressCount = 0
+        self.tapCount = 0
+        self.dragCount = 0
+        self.errorCount = 0
+        self.lastSelectionWasCorrect = false
+        self.completionStatus = .completed
+        self.hasAdvanced = false
+        
+        // Reset precision mode
+        self.precisionOn = false
+        self.loupeImage = nil
+    }
 
     // MARK: - Selection Tracking
     func onSelectionChanged(_ newRange: NSRange) {
@@ -55,7 +101,36 @@ final class EditorViewModel: ObservableObject {
         netDeltaChars += delta
         selectionChangeCount += 1
         lastAnchorIndex = newIndex
+        
+        // Track selection accuracy
+        let isCorrect = isExactMatch(newRange) || snapToTargetIfContained(in: newRange) != nil
+        if !isCorrect && lastSelectionWasCorrect {
+            errorCount += 1
+        }
+        lastSelectionWasCorrect = isCorrect
+        
+        // Debug logging for training tasks
+        if task.trainingTask {
+            let selectedText = newRange.location != NSNotFound && newRange.length > 0 ? 
+                (text as NSString).substring(with: newRange) : ""
+            print("Training Task Debug - Selected: '\(selectedText)', Target: '\(task.target)', Exact Match: \(isExactMatch(newRange))")
+        }
+        
         checkAutoComplete(current: newRange)
+    }
+    
+    // MARK: - Gesture Tracking
+    func recordGesture(type: GestureType) {
+        gestureCount += 1
+        switch type {
+        case .tap: tapCount += 1
+        case .longPress: longPressCount += 1
+        case .drag: dragCount += 1
+        }
+    }
+    
+    enum GestureType {
+        case tap, longPress, drag
     }
 
     private func anchorIndex(for range: NSRange) -> Int {
@@ -76,11 +151,24 @@ final class EditorViewModel: ObservableObject {
             loupeImage = nil
             return
         }
+        
+        let wasOn = precisionOn
         precisionOn = on
-        if on {
+        
+        if on && !wasOn {
+            // Precision mode activated
+            print("🔍 Precision mode activated for task: \(task.title)")
             usedPrecisionEver = true
+            precisionModeActivations += 1
+            precisionModeStartTime = Date()
             refreshLoupe()
-        } else {
+        } else if !on && wasOn {
+            // Precision mode deactivated
+            print("🔍 Precision mode deactivated for task: \(task.title)")
+            if let startTime = precisionModeStartTime {
+                totalPrecisionDuration += Date().timeIntervalSince(startTime)
+                precisionModeStartTime = nil
+            }
             loupeImage = nil
         }
     }
@@ -97,15 +185,16 @@ final class EditorViewModel: ObservableObject {
     }
 
     // MARK: - Matching (exact) + snap-to-target if selection includes only boundary whitespace/punct
-    private func isExactMatch(_ range: NSRange) -> Bool {
+    func isExactMatch(_ range: NSRange) -> Bool {
         let ns = text as NSString
-        guard range.location != NSNotFound, range.upperBound <= ns.length else { return false }
-        let sel = ns.substring(with: range)
-        if task.caseSensitive {
-            return sel == task.target
-        } else {
-            return sel.caseInsensitiveCompare(task.target) == .orderedSame
+        guard range.location != NSNotFound, range.upperBound <= ns.length else { 
+            print("❌ Invalid range: location=\(range.location), length=\(range.length), textLength=\(ns.length)")
+            return false 
         }
+        let sel = ns.substring(with: range)
+        let isMatch = task.caseSensitive ? sel == task.target : sel.caseInsensitiveCompare(task.target) == .orderedSame
+        print("🔍 Selection check: '\(sel)' vs '\(task.target)' -> \(isMatch)")
+        return isMatch
     }
 
     private func expectedRange() -> NSRange? {
@@ -143,29 +232,50 @@ final class EditorViewModel: ObservableObject {
 
     private func checkAutoComplete(current: NSRange) {
         if isExactMatch(current) {
-            if task.method == .precision && !usedPrecisionEver {
+            print("✅ Exact match found! Task: \(task.title), Method: \(task.method), Training: \(task.trainingTask)")
+            // Only check for precision mode requirement if it's a precision task and not a training task
+            if task.method == .precision && !usedPrecisionEver && !task.trainingTask {
                 hint = "Long-press to use Precision mode for this task."
                 UINotificationFeedbackGenerator().notificationOccurred(.warning)
                 return
             }
+            print("🚀 Calling finishAndAdvance for exact match")
             finishAndAdvance(final: current)
             return
         }
         // If user selected a bit more but only whitespace/punct around the target, snap & advance.
         if let snapped = snapToTargetIfContained(in: current) {
+            print("✅ Snapped match found! Task: \(task.title)")
             // Visually correct the selection on screen
             selected = snapped
-            if task.method == .precision && !usedPrecisionEver {
+            // Only check for precision mode requirement if it's a precision task and not a training task
+            if task.method == .precision && !usedPrecisionEver && !task.trainingTask {
                 hint = "Long-press to use Precision mode for this task."
                 UINotificationFeedbackGenerator().notificationOccurred(.warning)
                 return
             }
+            print("🚀 Calling finishAndAdvance for snapped match")
             finishAndAdvance(final: snapped)
         }
     }
 
     private func finishAndAdvance(final: NSRange) {
+        print("🎯 finishAndAdvance called for task: \(task.title)")
         let ended = Date()
+        
+        // Finalize precision mode duration if still active
+        if precisionOn, let startTime = precisionModeStartTime {
+            totalPrecisionDuration += ended.timeIntervalSince(startTime)
+        }
+        
+        // Calculate accuracy score
+        let accuracyScore = calculateAccuracyScore(final: final)
+        
+        // Calculate average selection speed
+        let totalTime = ended.timeIntervalSince(startedAt)
+        let averageSelectionSpeed = totalTime > 0 ? Double(final.length) / totalTime : 0.0
+        
+        print("📊 Creating MetricEvent for task completion")
         let event = MetricEvent(
             sessionId: sessionId,
             taskId: task.id,
@@ -175,9 +285,36 @@ final class EditorViewModel: ObservableObject {
             totalAdjustments: selectionChangeCount,
             excessTravel: max(0, selectionChangeCount > 0 ? (netDeltaChars - final.length) : 0),
             finalSelectionRange: final.location..<(final.location + final.length),
-            textLength: text.count
+            textLength: text.count,
+            precisionModeActivations: precisionModeActivations,
+            precisionModeDuration: totalPrecisionDuration,
+            gestureCount: gestureCount,
+            longPressCount: longPressCount,
+            tapCount: tapCount,
+            dragCount: dragCount,
+            accuracyScore: accuracyScore,
+            taskDifficulty: task.difficulty,
+            taskType: task.type,
+            completionStatus: completionStatus,
+            errorCount: errorCount,
+            averageSelectionSpeed: averageSelectionSpeed,
+            cognitiveLoadScore: nil
         )
+        
+        print("📤 Submitting metrics (fire and forget)")
+        // Submit metrics (fire and forget - don't block on this)
         onFinish?(event)
+        
+        // Prevent multiple advancement calls
+        guard !hasAdvanced else {
+            print("⚠️ Task already advanced, skipping duplicate call")
+            return
+        }
+        hasAdvanced = true
+        
+        print("➡️ Calling onAdvance to move to next task")
+        // Always advance the task regardless of metric submission success
+        onAdvance?()
 
         // Reset metrics for next task
         startedAt = Date()
@@ -185,8 +322,45 @@ final class EditorViewModel: ObservableObject {
         netDeltaChars = 0
         usedPrecisionEver = false
         hint = nil
-
-        onAdvance?()
+        
+        // Reset enhanced metrics
+        precisionModeActivations = 0
+        totalPrecisionDuration = 0
+        precisionModeStartTime = nil
+        gestureCount = 0
+        longPressCount = 0
+        tapCount = 0
+        dragCount = 0
+        errorCount = 0
+        lastSelectionWasCorrect = false
+        completionStatus = .completed
+        hasAdvanced = false
+    }
+    
+    // MARK: - Accuracy Calculation
+    private func calculateAccuracyScore(final: NSRange) -> Double {
+        guard let expectedRange = expectedRange() else { return 0.0 }
+        
+        // Calculate overlap between expected and actual selection
+        let intersection = NSIntersectionRange(final, expectedRange)
+        let overlapLength = intersection.length
+        
+        // Perfect match gets 1.0, partial overlap gets proportional score
+        if final == expectedRange {
+            return 1.0
+        } else if overlapLength > 0 {
+            // Calculate how much of the expected range is covered
+            let expectedLength = expectedRange.length
+            let coverageRatio = Double(overlapLength) / Double(expectedLength)
+            
+            // Penalize for selecting too much extra content
+            let extraContent = max(0, final.length - expectedLength)
+            let penalty = min(0.3, Double(extraContent) / Double(expectedLength) * 0.1)
+            
+            return max(0.0, coverageRatio - penalty)
+        } else {
+            return 0.0
+        }
     }
 }
 

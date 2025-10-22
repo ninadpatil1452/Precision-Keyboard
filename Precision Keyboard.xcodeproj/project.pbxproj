@@ -6,6 +6,22 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C3BE21232E842BF900768DA4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C3BE21202E842BF900768DA4 /* Assets.xcassets */; };
+		C3BE21242E842BF900768DA4 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3BE21212E842BF900768DA4 /* RootView.swift */; };
+		C3BE21252E842BF900768DA4 /* Precision_KeyboardApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3BE21222E842BF900768DA4 /* Precision_KeyboardApp.swift */; };
+		C3BE213B2E847BDA00768DA4 /* StudySessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3BE213A2E847BD800768DA4 /* StudySessionStore.swift */; };
+		C3BE21442E8481BC00768DA4 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3BE21382E847B2E00768DA4 /* Models.swift */; };
+		C3BE21452E8481D100768DA4 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3BE21392E847B9A00768DA4 /* APIClient.swift */; };
+		C3BE21462E8481DB00768DA4 /* SUSView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3BE21412E847CF400768DA4 /* SUSView.swift */; };
+		C3BE21472E8481E100768DA4 /* TaskEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3BE21402E847CCC00768DA4 /* TaskEditorView.swift */; };
+		C3BE21482E8481E700768DA4 /* PrecisionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3BE213F2E847CAA00768DA4 /* PrecisionOverlay.swift */; };
+		C3BE21492E8481EE00768DA4 /* TextViewRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3BE213D2E847C6100768DA4 /* TextViewRepresentable.swift */; };
+		C3BE214A2E8481F300768DA4 /* EditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3BE213C2E847C4300768DA4 /* EditorViewModel.swift */; };
+		C3BE214C2E848C0C00768DA4 /* RunTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3BE214B2E848C0700768DA4 /* RunTaskView.swift */; };
+		C3BE214E2E848C3900768DA4 /* CompletionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3BE214D2E848C3200768DA4 /* CompletionView.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		C3252D322E6ED02A00A356A3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,14 +43,24 @@
 		C3252D242E6ED02900A356A3 /* Precision Keyboard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Precision Keyboard.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C3252D312E6ED02A00A356A3 /* Precision KeyboardTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Precision KeyboardTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C3252D3B2E6ED02A00A356A3 /* Precision KeyboardUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Precision KeyboardUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C3BE21202E842BF900768DA4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C3BE21212E842BF900768DA4 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		C3BE21222E842BF900768DA4 /* Precision_KeyboardApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Precision_KeyboardApp.swift; sourceTree = "<group>"; };
+		C3BE21382E847B2E00768DA4 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		C3BE21392E847B9A00768DA4 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		C3BE213A2E847BD800768DA4 /* StudySessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudySessionStore.swift; sourceTree = "<group>"; };
+		C3BE213C2E847C4300768DA4 /* EditorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorViewModel.swift; sourceTree = "<group>"; };
+		C3BE213D2E847C6100768DA4 /* TextViewRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextViewRepresentable.swift; sourceTree = "<group>"; };
+		C3BE213F2E847CAA00768DA4 /* PrecisionOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrecisionOverlay.swift; sourceTree = "<group>"; };
+		C3BE21402E847CCC00768DA4 /* TaskEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskEditorView.swift; sourceTree = "<group>"; };
+		C3BE21412E847CF400768DA4 /* SUSView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SUSView.swift; sourceTree = "<group>"; };
+		C3BE21422E847DD200768DA4 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		C3BE21432E847DDB00768DA4 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		C3BE214B2E848C0700768DA4 /* RunTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunTaskView.swift; sourceTree = "<group>"; };
+		C3BE214D2E848C3200768DA4 /* CompletionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		C3252D262E6ED02900A356A3 /* Precision Keyboard */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Precision Keyboard";
-			sourceTree = "<group>";
-		};
 		C3252D342E6ED02A00A356A3 /* Precision KeyboardTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "Precision KeyboardTests";
@@ -75,10 +101,15 @@
 		C3252D1B2E6ED02900A356A3 = {
 			isa = PBXGroup;
 			children = (
-				C3252D262E6ED02900A356A3 /* Precision Keyboard */,
+				C3BE212F2E8479A900768DA4 /* App */,
+				C3BE21362E847A3800768DA4 /* Config */,
+				C3BE21302E8479C900768DA4 /* Core */,
+				C3BE21352E847A2E00768DA4 /* DesignSystem */,
+				C3BE21312E8479D700768DA4 /* Features */,
 				C3252D342E6ED02A00A356A3 /* Precision KeyboardTests */,
 				C3252D3E2E6ED02A00A356A3 /* Precision KeyboardUITests */,
 				C3252D252E6ED02900A356A3 /* Products */,
+				C3BE21372E847A4500768DA4 /* Resources */,
 			);
 			sourceTree = "<group>";
 		};
@@ -90,6 +121,79 @@
 				C3252D3B2E6ED02A00A356A3 /* Precision KeyboardUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		C3BE212F2E8479A900768DA4 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				C3BE213A2E847BD800768DA4 /* StudySessionStore.swift */,
+				C3BE21212E842BF900768DA4 /* RootView.swift */,
+				C3BE21222E842BF900768DA4 /* Precision_KeyboardApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		C3BE21302E8479C900768DA4 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				C3BE21392E847B9A00768DA4 /* APIClient.swift */,
+				C3BE21382E847B2E00768DA4 /* Models.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		C3BE21312E8479D700768DA4 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				C3BE21342E847A1E00768DA4 /* SUS */,
+				C3BE21332E847A1400768DA4 /* PrecisionEditor */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		C3BE21332E847A1400768DA4 /* PrecisionEditor */ = {
+			isa = PBXGroup;
+			children = (
+				C3BE214B2E848C0700768DA4 /* RunTaskView.swift */,
+				C3BE21402E847CCC00768DA4 /* TaskEditorView.swift */,
+				C3BE213F2E847CAA00768DA4 /* PrecisionOverlay.swift */,
+				C3BE213D2E847C6100768DA4 /* TextViewRepresentable.swift */,
+				C3BE213C2E847C4300768DA4 /* EditorViewModel.swift */,
+			);
+			path = PrecisionEditor;
+			sourceTree = "<group>";
+		};
+		C3BE21342E847A1E00768DA4 /* SUS */ = {
+			isa = PBXGroup;
+			children = (
+				C3BE214D2E848C3200768DA4 /* CompletionView.swift */,
+				C3BE21412E847CF400768DA4 /* SUSView.swift */,
+			);
+			path = SUS;
+			sourceTree = "<group>";
+		};
+		C3BE21352E847A2E00768DA4 /* DesignSystem */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = DesignSystem;
+			sourceTree = "<group>";
+		};
+		C3BE21362E847A3800768DA4 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				C3BE21432E847DDB00768DA4 /* Release.xcconfig */,
+				C3BE21422E847DD200768DA4 /* Debug.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		C3BE21372E847A4500768DA4 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				C3BE21202E842BF900768DA4 /* Assets.xcassets */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -106,9 +210,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				C3252D262E6ED02900A356A3 /* Precision Keyboard */,
 			);
 			name = "Precision Keyboard";
 			packageProductDependencies = (
@@ -212,6 +313,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C3BE21232E842BF900768DA4 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -236,6 +338,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C3BE214E2E848C3900768DA4 /* CompletionView.swift in Sources */,
+				C3BE21472E8481E100768DA4 /* TaskEditorView.swift in Sources */,
+				C3BE21242E842BF900768DA4 /* RootView.swift in Sources */,
+				C3BE213B2E847BDA00768DA4 /* StudySessionStore.swift in Sources */,
+				C3BE214C2E848C0C00768DA4 /* RunTaskView.swift in Sources */,
+				C3BE21492E8481EE00768DA4 /* TextViewRepresentable.swift in Sources */,
+				C3BE21462E8481DB00768DA4 /* SUSView.swift in Sources */,
+				C3BE21252E842BF900768DA4 /* Precision_KeyboardApp.swift in Sources */,
+				C3BE21452E8481D100768DA4 /* APIClient.swift in Sources */,
+				C3BE214A2E8481F300768DA4 /* EditorViewModel.swift in Sources */,
+				C3BE21442E8481BC00768DA4 /* Models.swift in Sources */,
+				C3BE21482E8481E700768DA4 /* PrecisionOverlay.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -395,6 +509,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CBKQGQ2MNB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -422,6 +537,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CBKQGQ2MNB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

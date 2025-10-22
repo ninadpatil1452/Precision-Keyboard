@@ -70,11 +70,14 @@ struct SUSView: View {
         busy = true
         defer { busy = false }
         let req = SUSSubmission(sessionId: session.sessionId, responses: answers, submittedAt: Date())
+        print("📊 Submitting SUS: Session=\(session.sessionId), Responses=\(answers)")
         do {
             try await session.submitSUS(req)
+            print("✅ SUS submitted successfully")
             status = "Submitted!"
             onSubmitted()
         } catch {
+            print("❌ SUS submission failed: \(error)")
             status = error.localizedDescription
         }
     }

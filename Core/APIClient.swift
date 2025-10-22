@@ -9,7 +9,7 @@ import Foundation
 
 final class APIClient {
     // TODO: set your Go backend URL
-    private let baseURL = URL(string: "http://localhost:8080")!
+    private let baseURL = URL(string: "https://kasey-scorpioid-trina.ngrok-free.dev")!
 
     private let json = JSONDecoder()
     private let enc = JSONEncoder()
@@ -65,7 +65,7 @@ final class APIClient {
 
     static func replayOutboxIfAny() {
         Task.detached {
-            guard let baseURL = URL(string: "http://localhost:8080") else { return }
+            guard let baseURL = URL(string: "https://kasey-scorpioid-trina.ngrok-free.dev") else { return }
             let enc = JSONEncoder(); enc.dateEncodingStrategy = .iso8601
             let dec = JSONDecoder(); dec.dateDecodingStrategy = .iso8601
             do {

@@ -85,7 +85,8 @@ struct TextViewRepresentable: UIViewRepresentable {
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 parent.onPrecisionChange(true)
             case .ended, .cancelled, .failed:
-                parent.onPrecisionChange(false)
+                // Don't automatically turn off precision mode - let user tap to exit
+                break
             default: break
             }
         }

@@ -170,15 +170,6 @@ The collected data supports various statistical analyses:
 
 This project is developed for academic research purposes. Please cite appropriately if using this work in your research.
 
-## 🤝 Contributing
-
-This is a research project. For contributions or questions, please contact the research team.
-
-## 📚 References
-
-- System Usability Scale (SUS): Brooke, J. (1996). SUS: A 'Quick and Dirty' Usability Scale
-- Mobile Text Selection: Research on touchscreen interaction challenges
-- Precision Interaction: Studies on magnified selection techniques
 
 ## 🔍 Future Work
 

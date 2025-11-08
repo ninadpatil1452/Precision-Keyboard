@@ -1,4 +1,4 @@
-# PrecisionPointer Research Application
+# Precision Keyboard Research Application
 
 A comprehensive iOS research application designed to evaluate the effectiveness of precision text selection methods on mobile devices. This project implements and tests "PrecisionPointer" - a novel interaction paradigm for accurate text selection on touchscreens.
 

@@ -84,6 +84,10 @@ Standard text selection on mobile touchscreens often suffers from the "fat finge
    ```
    The server will start on `http://localhost:8080`
 
+3. Access the Interactive Dashboard:
+   Open your browser and navigate to `http://localhost:8080` or `http://localhost:8080/dashboard`
+   The dashboard provides real-time visualization of all collected research data.
+
 ### iOS App Setup
 1. Open `Precision Keyboard.xcodeproj` in Xcode
 2. Select your target device or simulator
@@ -105,6 +109,46 @@ Standard text selection on mobile touchscreens often suffers from the "fat finge
 2. **Monitor Logs**: Watch console output for real-time data collection
 3. **Data Export**: Check `study_results.csv` and `sus_responses.csv` files
 4. **Analysis**: Import CSV files into statistical analysis software
+
+## 📊 Interactive Dashboard
+
+The research dashboard provides real-time visualization and analysis of all collected data. Access it by opening `http://localhost:8080` in your browser after starting the backend server.
+
+### Dashboard Features
+
+- **Real-time Data Visualization**: 
+  - Completion time comparison between methods
+  - Accuracy score analysis
+  - Performance distribution charts
+  - Task difficulty analysis
+  - Precision mode usage statistics
+  - SUS score distribution
+
+- **Interactive Filters**:
+  - Filter by participant
+  - Filter by selection method (standard/precision)
+  - Filter by task difficulty (easy/medium/hard)
+  - Auto-refresh every 30 seconds
+
+- **Summary Statistics**:
+  - Total participants and tasks completed
+  - Average completion time
+  - Average accuracy scores
+  - Average SUS scores
+
+- **Data Export**:
+  - Export filtered data as CSV
+  - Download complete dataset for analysis
+
+- **Recent Task Table**:
+  - View last 20 completed tasks
+  - See participant, method, time, accuracy, and status
+
+### Dashboard API Endpoints
+
+- `GET /api/metrics` - Get all metrics as JSON
+- `GET /api/sus` - Get all SUS survey responses as JSON
+- `GET /` or `/dashboard` - Access the dashboard interface
 
 ## 📈 Data Collection
 

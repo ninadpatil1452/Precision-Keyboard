@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Precision Keyboard Research Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            color: #666;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .stat-card .value {
+            color: #333;
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .change {
+            color: #4caf50;
+            font-size: 0.9em;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .chart-card h2 {
+            color: #333;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: white;
+            font-size: 1.2em;
+        }
+
+        .error {
+            background: #ff4444;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .controls h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .control-group select,
+        .control-group button {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 1em;
+            background: white;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-group select:hover,
+        .control-group button:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .control-group button {
+            background: #667eea;
+            color: white;
+        }
+
+        .control-group button:hover {
+            background: #5568d3;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        .method-standard {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+
+        .method-precision {
+            background: #f3e5f5;
+            color: #7b1fa2;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔬 Precision Keyboard Research Dashboard</h1>
+            <p>Real-time data visualization and analysis</p>
+        </div>
+
+        <div id="error-container"></div>
+
+        <div class="controls">
+            <h3>Filters & Controls</h3>
+            <div class="control-group">
+                <select id="participant-filter">
+                    <option value="all">All Participants</option>
+                </select>
+                <select id="method-filter">
+                    <option value="all">All Methods</option>
+                    <option value="standard">Standard</option>
+                    <option value="precision">Precision</option>
+                </select>
+                <select id="difficulty-filter">
+                    <option value="all">All Difficulties</option>
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
+                <button onclick="refreshData()">🔄 Refresh Data</button>
+                <button onclick="exportData()">📊 Export CSV</button>
+            </div>
+        </div>
+
+        <div class="stats-grid" id="stats-grid">
+            <div class="stat-card">
+                <h3>Total Participants</h3>
+                <div class="value" id="total-participants">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Tasks Completed</h3>
+                <div class="value" id="total-tasks">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Average Completion Time</h3>
+                <div class="value" id="avg-time">-</div>
+                <div class="change">ms</div>
+            </div>
+            <div class="stat-card">
+                <h3>Average Accuracy</h3>
+                <div class="value" id="avg-accuracy">-</div>
+                <div class="change">score</div>
+            </div>
+            <div class="stat-card">
+                <h3>Average SUS Score</h3>
+                <div class="value" id="avg-sus">-</div>
+                <div class="change">/ 100</div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h2>Completion Time Comparison</h2>
+                <div class="chart-container">
+                    <canvas id="time-chart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h2>Accuracy Comparison</h2>
+                <div class="chart-container">
+                    <canvas id="accuracy-chart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h2>Method Performance Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="performance-chart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h2>Task Difficulty Analysis</h2>
+                <div class="chart-container">
+                    <canvas id="difficulty-chart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card full-width">
+                <h2>Completion Time Over Time</h2>
+                <div class="chart-container">
+                    <canvas id="time-series-chart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h2>Precision Mode Usage</h2>
+                <div class="chart-container">
+                    <canvas id="precision-usage-chart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h2>SUS Score Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="sus-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <h2 style="margin-bottom: 20px; color: #333;">Recent Task Completions</h2>
+            <table id="tasks-table">
+                <thead>
+                    <tr>
+                        <th>Participant</th>
+                        <th>Task</th>
+                        <th>Method</th>
+                        <th>Difficulty</th>
+                        <th>Time (ms)</th>
+                        <th>Accuracy</th>
+                        <th>Errors</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="tasks-table-body">
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 50px;">
+                            <div class="loading">Loading data...</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let charts = {};
+        let allData = {
+            metrics: [],
+            sus: []
+        };
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            setInterval(refreshData, 30000); // Auto-refresh every 30 seconds
+        });
+
+        async function loadData() {
+            try {
+                const [metricsResponse, susResponse] = await Promise.all([
+                    fetch('/api/metrics'),
+                    fetch('/api/sus')
+                ]);
+
+                if (!metricsResponse.ok || !susResponse.ok) {
+                    throw new Error('Failed to load data');
+                }
+
+                allData.metrics = await metricsResponse.json();
+                allData.sus = await susResponse.json();
+
+                updateParticipantFilter();
+                updateStats();
+                updateCharts();
+                updateTable();
+            } catch (error) {
+                showError('Error loading data: ' + error.message);
+            }
+        }
+
+        function refreshData() {
+            loadData();
+        }
+
+        function updateParticipantFilter() {
+            const filter = document.getElementById('participant-filter');
+            const participants = [...new Set(allData.metrics.map(m => m.participantId))];
+            
+            filter.innerHTML = '<option value="all">All Participants</option>';
+            participants.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p;
+                option.textContent = p;
+                filter.appendChild(option);
+            });
+        }
+
+        function getFilteredData() {
+            const participant = document.getElementById('participant-filter').value;
+            const method = document.getElementById('method-filter').value;
+            const difficulty = document.getElementById('difficulty-filter').value;
+
+            return allData.metrics.filter(m => {
+                return (participant === 'all' || m.participantId === participant) &&
+                       (method === 'all' || m.selectionMethod === method) &&
+                       (difficulty === 'all' || m.taskDifficulty === difficulty);
+            });
+        }
+
+        function updateStats() {
+            const data = getFilteredData();
+            
+            const participants = new Set(data.map(m => m.participantId)).size;
+            document.getElementById('total-participants').textContent = participants;
+            
+            document.getElementById('total-tasks').textContent = data.length;
+            
+            const avgTime = data.length > 0 
+                ? Math.round(data.reduce((sum, m) => sum + (m.timeTaken_ms || 0), 0) / data.length)
+                : 0;
+            document.getElementById('avg-time').textContent = avgTime.toLocaleString();
+            
+            const avgAccuracy = data.length > 0
+                ? (data.reduce((sum, m) => sum + (m.accuracyScore || 0), 0) / data.length * 100).toFixed(1)
+                : 0;
+            document.getElementById('avg-accuracy').textContent = avgAccuracy + '%';
+            
+            const avgSUS = allData.sus.length > 0
+                ? Math.round(allData.sus.reduce((sum, s) => {
+                    const score = calculateSUSScore(s.responses);
+                    return sum + score;
+                }, 0) / allData.sus.length)
+                : 0;
+            document.getElementById('avg-sus').textContent = avgSUS;
+        }
+
+        function updateCharts() {
+            const data = getFilteredData();
+            updateTimeChart(data);
+            updateAccuracyChart(data);
+            updatePerformanceChart(data);
+            updateDifficultyChart(data);
+            updateTimeSeriesChart(data);
+            updatePrecisionUsageChart(data);
+            updateSUSChart();
+        }
+
+        function updateTimeChart(data) {
+            const standard = data.filter(m => m.selectionMethod === 'standard');
+            const precision = data.filter(m => m.selectionMethod === 'precision');
+            
+            const standardTimes = standard.map(m => m.timeTaken_ms || 0);
+            const precisionTimes = precision.map(m => m.timeTaken_ms || 0);
+
+            if (charts.timeChart) {
+                charts.timeChart.destroy();
+            }
+
+            const ctx = document.getElementById('time-chart').getContext('2d');
+            charts.timeChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Standard', 'Precision'],
+                    datasets: [{
+                        label: 'Average Time (ms)',
+                        data: [
+                            standardTimes.length > 0 ? standardTimes.reduce((a, b) => a + b, 0) / standardTimes.length : 0,
+                            precisionTimes.length > 0 ? precisionTimes.reduce((a, b) => a + b, 0) / precisionTimes.length : 0
+                        ],
+                        backgroundColor: ['#2196F3', '#9C27B0'],
+                        borderColor: ['#1976D2', '#7B1FA2'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        function updateAccuracyChart(data) {
+            const standard = data.filter(m => m.selectionMethod === 'standard');
+            const precision = data.filter(m => m.selectionMethod === 'precision');
+            
+            const standardAccuracy = standard.map(m => (m.accuracyScore || 0) * 100);
+            const precisionAccuracy = precision.map(m => (m.accuracyScore || 0) * 100);
+
+            if (charts.accuracyChart) {
+                charts.accuracyChart.destroy();
+            }
+
+            const ctx = document.getElementById('accuracy-chart').getContext('2d');
+            charts.accuracyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Standard', 'Precision'],
+                    datasets: [{
+                        label: 'Average Accuracy (%)',
+                        data: [
+                            standardAccuracy.length > 0 ? standardAccuracy.reduce((a, b) => a + b, 0) / standardAccuracy.length : 0,
+                            precisionAccuracy.length > 0 ? precisionAccuracy.reduce((a, b) => a + b, 0) / precisionAccuracy.length : 0
+                        ],
+                        backgroundColor: ['#2196F3', '#9C27B0'],
+                        borderColor: ['#1976D2', '#7B1FA2'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, max: 100 }
+                    }
+                }
+            });
+        }
+
+        function updatePerformanceChart(data) {
+            const standard = data.filter(m => m.selectionMethod === 'standard');
+            const precision = data.filter(m => m.selectionMethod === 'precision');
+
+            if (charts.performanceChart) {
+                charts.performanceChart.destroy();
+            }
+
+            const ctx = document.getElementById('performance-chart').getContext('2d');
+            charts.performanceChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Standard',
+                        data: standard.map(m => ({
+                            x: m.timeTaken_ms || 0,
+                            y: (m.accuracyScore || 0) * 100
+                        })),
+                        backgroundColor: 'rgba(33, 150, 243, 0.6)',
+                        borderColor: '#2196F3'
+                    }, {
+                        label: 'Precision',
+                        data: precision.map(m => ({
+                            x: m.timeTaken_ms || 0,
+                            y: (m.accuracyScore || 0) * 100
+                        })),
+                        backgroundColor: 'rgba(156, 39, 176, 0.6)',
+                        borderColor: '#9C27B0'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true },
+                        title: { display: false }
+                    },
+                    scales: {
+                        x: { title: { display: true, text: 'Time (ms)' } },
+                        y: { title: { display: true, text: 'Accuracy (%)' } }
+                    }
+                }
+            });
+        }
+
+        function updateDifficultyChart(data) {
+            const difficulties = ['easy', 'medium', 'hard'];
+            const standardData = [];
+            const precisionData = [];
+
+            difficulties.forEach(diff => {
+                const standard = data.filter(m => m.selectionMethod === 'standard' && m.taskDifficulty === diff);
+                const precision = data.filter(m => m.selectionMethod === 'precision' && m.taskDifficulty === diff);
+                
+                standardData.push(standard.length > 0 
+                    ? standard.reduce((sum, m) => sum + (m.timeTaken_ms || 0), 0) / standard.length 
+                    : 0);
+                precisionData.push(precision.length > 0
+                    ? precision.reduce((sum, m) => sum + (m.timeTaken_ms || 0), 0) / precision.length
+                    : 0);
+            });
+
+            if (charts.difficultyChart) {
+                charts.difficultyChart.destroy();
+            }
+
+            const ctx = document.getElementById('difficulty-chart').getContext('2d');
+            charts.difficultyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Easy', 'Medium', 'Hard'],
+                    datasets: [{
+                        label: 'Standard',
+                        data: standardData,
+                        backgroundColor: '#2196F3'
+                    }, {
+                        label: 'Precision',
+                        data: precisionData,
+                        backgroundColor: '#9C27B0'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true },
+                        title: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        function updateTimeSeriesChart(data) {
+            const sorted = [...data].sort((a, b) => {
+                const dateA = new Date(a.startedAt);
+                const dateB = new Date(b.startedAt);
+                return dateA - dateB;
+            });
+
+            const labels = sorted.map((m, i) => `Task ${i + 1}`);
+            const standardTimes = sorted.map(m => m.selectionMethod === 'standard' ? m.timeTaken_ms : null);
+            const precisionTimes = sorted.map(m => m.selectionMethod === 'precision' ? m.timeTaken_ms : null);
+
+            if (charts.timeSeriesChart) {
+                charts.timeSeriesChart.destroy();
+            }
+
+            const ctx = document.getElementById('time-series-chart').getContext('2d');
+            charts.timeSeriesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Standard',
+                        data: standardTimes,
+                        borderColor: '#2196F3',
+                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Precision',
+                        data: precisionTimes,
+                        borderColor: '#9C27B0',
+                        backgroundColor: 'rgba(156, 39, 176, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true },
+                        title: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        function updatePrecisionUsageChart(data) {
+            const precision = data.filter(m => m.selectionMethod === 'precision');
+            const withPrecision = precision.filter(m => (m.precisionActivations || 0) > 0);
+            const avgActivations = precision.length > 0
+                ? precision.reduce((sum, m) => sum + (m.precisionActivations || 0), 0) / precision.length
+                : 0;
+            const avgDuration = precision.length > 0
+                ? precision.reduce((sum, m) => sum + (m.precisionDuration || 0), 0) / precision.length
+                : 0;
+
+            if (charts.precisionUsageChart) {
+                charts.precisionUsageChart.destroy();
+            }
+
+            const ctx = document.getElementById('precision-usage-chart').getContext('2d');
+            charts.precisionUsageChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Used Precision', 'Did Not Use'],
+                    datasets: [{
+                        data: [withPrecision.length, precision.length - withPrecision.length],
+                        backgroundColor: ['#9C27B0', '#E0E0E0'],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true },
+                        title: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                afterLabel: function(context) {
+                                    if (context.label === 'Used Precision') {
+                                        return `Avg Activations: ${avgActivations.toFixed(1)}\nAvg Duration: ${avgDuration.toFixed(2)}s`;
+                                    }
+                                    return '';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateSUSChart() {
+            const scores = allData.sus.map(s => calculateSUSScore(s.responses));
+
+            if (charts.susChart) {
+                charts.susChart.destroy();
+            }
+
+            const ctx = document.getElementById('sus-chart').getContext('2d');
+            charts.susChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: scores.map((_, i) => `Participant ${i + 1}`),
+                    datasets: [{
+                        label: 'SUS Score',
+                        data: scores,
+                        backgroundColor: scores.map(s => s >= 68 ? '#4CAF50' : s >= 51 ? '#FF9800' : '#F44336'),
+                        borderColor: '#333',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, max: 100 }
+                    }
+                }
+            });
+        }
+
+        function updateTable() {
+            const data = getFilteredData();
+            const tbody = document.getElementById('tasks-table-body');
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 50px;">No data available</td></tr>';
+                return;
+            }
+
+            const recent = data.slice(-20).reverse(); // Show last 20 tasks
+            tbody.innerHTML = recent.map(m => `
+                <tr>
+                    <td>${m.participantId}</td>
+                    <td>${m.taskName}</td>
+                    <td><span class="method-${m.selectionMethod}">${m.selectionMethod}</span></td>
+                    <td>${m.taskDifficulty}</td>
+                    <td>${(m.timeTaken_ms || 0).toLocaleString()}</td>
+                    <td>${((m.accuracyScore || 0) * 100).toFixed(1)}%</td>
+                    <td>${m.errorCount || 0}</td>
+                    <td>${m.completionStatus || 'completed'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function calculateSUSScore(responses) {
+            if (!responses || responses.length !== 10) return 0;
+            let sum = 0;
+            for (let i = 0; i < 10; i++) {
+                if (i % 2 === 0) {
+                    sum += responses[i] - 1;
+                } else {
+                    sum += 5 - responses[i];
+                }
+            }
+            return Math.round(sum * 2.5);
+        }
+
+        function showError(message) {
+            const container = document.getElementById('error-container');
+            container.innerHTML = `<div class="error">${message}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        function exportData() {
+            const data = getFilteredData();
+            const csv = convertToCSV(data);
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `precision-pointer-data-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function convertToCSV(data) {
+            const headers = ['ParticipantID', 'TaskName', 'SelectionMethod', 'TaskDifficulty', 'TimeTakenMs', 'AccuracyScore', 'ErrorCount', 'CompletionStatus'];
+            const rows = data.map(m => [
+                m.participantId,
+                m.taskName,
+                m.selectionMethod,
+                m.taskDifficulty,
+                m.timeTaken_ms || 0,
+                (m.accuracyScore || 0) * 100,
+                m.errorCount || 0,
+                m.completionStatus || 'completed'
+            ]);
+            return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+        }
+
+        // Add event listeners for filters
+        document.getElementById('participant-filter').addEventListener('change', () => {
+            updateStats();
+            updateCharts();
+            updateTable();
+        });
+
+        document.getElementById('method-filter').addEventListener('change', () => {
+            updateStats();
+            updateCharts();
+            updateTable();
+        });
+
+        document.getElementById('difficulty-filter').addEventListener('change', () => {
+            updateStats();
+            updateCharts();
+            updateTable();
+        });
+    </script>
+</body>
+</html>

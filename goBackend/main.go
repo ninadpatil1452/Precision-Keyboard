@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -284,30 +285,181 @@ func calculateSUSScore(responses []int) int {
 	return int(float64(total) * 2.5)
 }
 
+// metricsAPIHandler serves metrics data as JSON
+func metricsAPIHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Content-Type", "application/json")
+
+	metrics := readMetricsCSV()
+	json.NewEncoder(w).Encode(metrics)
+}
+
+// susAPIHandler serves SUS data as JSON
+func susAPIHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Content-Type", "application/json")
+
+	sus := readSUSCSV()
+	json.NewEncoder(w).Encode(sus)
+}
+
+// dashboardHandler serves the dashboard HTML
+func dashboardHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	http.ServeFile(w, r, "dashboard.html")
+}
+
+// readMetricsCSV reads the metrics CSV file and returns JSON
+func readMetricsCSV() []StudyResult {
+	file, err := os.Open("study_results.csv")
+	if err != nil {
+		return []StudyResult{}
+	}
+	defer file.Close()
+
+	reader := csv.NewReader(file)
+	records, err := reader.ReadAll()
+	if err != nil || len(records) < 2 {
+		return []StudyResult{}
+	}
+
+	// Skip header row
+	var results []StudyResult
+	for i := 1; i < len(records); i++ {
+		record := records[i]
+		if len(record) < 26 {
+			continue
+		}
+
+		startedAt, _ := time.Parse(time.RFC3339, record[7])
+		endedAt, _ := time.Parse(time.RFC3339, record[8])
+		timeTaken, _ := strconv.Atoi(record[9])
+		totalAdjustments, _ := strconv.Atoi(record[10])
+		excessTravel, _ := strconv.Atoi(record[11])
+		precisionActivations, _ := strconv.Atoi(record[12])
+		precisionDuration, _ := strconv.ParseFloat(record[13], 64)
+		gestureCount, _ := strconv.Atoi(record[14])
+		longPressCount, _ := strconv.Atoi(record[15])
+		tapCount, _ := strconv.Atoi(record[16])
+		dragCount, _ := strconv.Atoi(record[17])
+		accuracyScore, _ := strconv.ParseFloat(record[18], 64)
+		errorCount, _ := strconv.Atoi(record[19])
+		avgSelectionSpeed, _ := strconv.ParseFloat(record[20], 64)
+		finalSelectionStart, _ := strconv.Atoi(record[22])
+		finalSelectionEnd, _ := strconv.Atoi(record[23])
+		textLength, _ := strconv.Atoi(record[24])
+
+		var cognitiveLoad *float64
+		if record[25] != "" {
+			cl, _ := strconv.ParseFloat(record[25], 64)
+			cognitiveLoad = &cl
+		}
+
+		result := StudyResult{
+			SessionID:             record[0],
+			ParticipantID:         record[1],
+			TaskID:                record[2],
+			TaskName:              record[3],
+			SelectionMethod:       record[4],
+			TaskDifficulty:        record[5],
+			TaskType:              record[6],
+			StartedAt:             startedAt,
+			EndedAt:               endedAt,
+			TimeTakenMs:           timeTaken,
+			TotalAdjustments:      totalAdjustments,
+			ExcessTravel:          excessTravel,
+			PrecisionActivations:  precisionActivations,
+			PrecisionDuration:     precisionDuration,
+			GestureCount:          gestureCount,
+			LongPressCount:        longPressCount,
+			TapCount:              tapCount,
+			DragCount:             dragCount,
+			AccuracyScore:         accuracyScore,
+			ErrorCount:            errorCount,
+			AverageSelectionSpeed: avgSelectionSpeed,
+			CompletionStatus:      record[21],
+			FinalSelectionStart:   finalSelectionStart,
+			FinalSelectionEnd:     finalSelectionEnd,
+			TextLength:            textLength,
+			CognitiveLoadScore:    cognitiveLoad,
+		}
+		results = append(results, result)
+	}
+
+	return results
+}
+
+// readSUSCSV reads the SUS CSV file and returns JSON
+func readSUSCSV() []SUSSubmission {
+	file, err := os.Open("sus_responses.csv")
+	if err != nil {
+		return []SUSSubmission{}
+	}
+	defer file.Close()
+
+	reader := csv.NewReader(file)
+	records, err := reader.ReadAll()
+	if err != nil || len(records) < 2 {
+		return []SUSSubmission{}
+	}
+
+	// Skip header row
+	var submissions []SUSSubmission
+	for i := 1; i < len(records); i++ {
+		record := records[i]
+		if len(record) < 13 {
+			continue
+		}
+
+		submittedAt, _ := time.Parse(time.RFC3339, record[1])
+		var responses []int
+		for j := 2; j < 12; j++ {
+			val, _ := strconv.Atoi(record[j])
+			responses = append(responses, val)
+		}
+
+		submission := SUSSubmission{
+			SessionID:   record[0],
+			Responses:   responses,
+			SubmittedAt: submittedAt,
+		}
+		submissions = append(submissions, submission)
+	}
+
+	return submissions
+}
+
 func main() {
 	// Register all endpoints
 	http.HandleFunc("/log", metricsHandler)                 // Legacy endpoint for backward compatibility
 	http.HandleFunc("/metrics", metricsHandler)             // New comprehensive metrics endpoint
 	http.HandleFunc("/sessions/start", sessionStartHandler) // Session initialization
 	http.HandleFunc("/sus", susHandler)                     // SUS survey submissions
-
-	// Add CORS headers for all requests
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-
-		http.NotFound(w, r)
-	})
+	http.HandleFunc("/api/metrics", metricsAPIHandler)      // GET metrics as JSON
+	http.HandleFunc("/api/sus", susAPIHandler)              // GET SUS data as JSON
+	http.HandleFunc("/dashboard", dashboardHandler)         // Dashboard HTML
+	http.HandleFunc("/", dashboardHandler)                  // Dashboard as root
 
 	port := "8080"
 	log.Printf("Enhanced PrecisionPointer Research Server starting on http://localhost:%s\n", port)
 	log.Printf("Available endpoints:")
+	log.Printf("  GET  / or /dashboard - Interactive dashboard")
+	log.Printf("  GET  /api/metrics - Get all metrics as JSON")
+	log.Printf("  GET  /api/sus - Get all SUS data as JSON")
 	log.Printf("  POST /metrics - Submit comprehensive task metrics")
 	log.Printf("  POST /sessions/start - Initialize study session")
 	log.Printf("  POST /sus - Submit SUS survey responses")

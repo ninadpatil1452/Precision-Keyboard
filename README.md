@@ -1,13 +1,13 @@
 # Precision Keyboard Research Application
 
-A comprehensive iOS research application designed to evaluate the effectiveness of precision text selection methods on mobile devices. This project implements and tests "PrecisionPointer" - a novel interaction paradigm for accurate text selection on touchscreens.
+A comprehensive iOS research application designed to evaluate the effectiveness of precision text selection methods on mobile devices. This project implements and tests "Precision Keyboard" - a novel interaction paradigm for accurate text selection on touchscreens.
 
 ## 📋 Project Overview
 
-Standard text selection on mobile touchscreens often suffers from the "fat finger" problem, where users' fingers occlude the text they're trying to select, leading to frequent errors and poor user experience. PrecisionPointer addresses this by introducing a gesture-activated precision mode that provides magnified text selection capabilities.
+Standard text selection on mobile touchscreens often suffers from the "fat finger" problem, where users' fingers occlude the text they're trying to select, leading to frequent errors and poor user experience. Precision Keyboard addresses this by introducing a gesture-activated precision mode that provides magnified text selection capabilities.
 
 ### Research Hypothesis
-> PrecisionPointer will demonstrate statistically significant improvement in both speed and accuracy for precision-oriented tasks and will receive higher subjective satisfaction ratings compared to standard text selection methods.
+> Precision Keyboard will demonstrate statistically significant improvement in both speed and accuracy for precision-oriented tasks and will receive higher subjective satisfaction ratings compared to standard text selection methods.
 
 ## 🏗️ Architecture
 
